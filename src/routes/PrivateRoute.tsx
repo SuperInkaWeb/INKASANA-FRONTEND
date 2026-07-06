@@ -1,0 +1,31 @@
+import { Navigate, Outlet } from "react-router-dom";
+import { Spin } from "antd";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useOnboardingGuard } from "../features/onboarding/hooks/useOnboardingGuard";
+
+export function PrivateRoute() {
+  const { isAuthenticated, isLoading } = useAuth0();
+
+  const { checking } = useOnboardingGuard(isAuthenticated);
+
+  if (isLoading || checking) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Outlet />;
+}
