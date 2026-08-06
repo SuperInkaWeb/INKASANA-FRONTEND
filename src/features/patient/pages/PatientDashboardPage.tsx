@@ -1,0 +1,11 @@
+import { BellOutlined, CalendarOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Button, Card, Col, Empty, Row, Statistic, Typography } from "antd";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { patientPortalApi } from "../api/patient-portal.api";
+const { Title, Text } = Typography;
+export function PatientDashboardPage() {
+ const navigate = useNavigate(); const profile = useQuery({ queryKey:["patient-profile"], queryFn: patientPortalApi.getProfile }); const appointments = useQuery({ queryKey:["patient-appointments"], queryFn: patientPortalApi.appointments });
+ const upcoming = (appointments.data ?? []).filter(a => new Date(`${a.date}T${a.time}`) >= new Date()).sort((a,b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))[0];
+ return <><Card loading={profile.isLoading}><Avatar size={64} src={profile.data?.avatarUrl} icon={<UserOutlined />} /><Title level={2} style={{ marginTop:16, marginBottom: 0 }}>¡Hola de nuevo!</Title><Text>{profile.data?.email}</Text><Button style={{ float:"right" }} onClick={() => navigate("/patient/profile")}>Configurar perfil</Button><Title level={4}>Resumen de todas tus actividades</Title></Card><Row gutter={[16,16]} style={{ marginTop:24 }}><Col xs={24} md={8}><Card><Statistic title="Citas registradas" value={appointments.data?.length ?? 0} prefix={<CalendarOutlined />} /></Card></Col><Col xs={24} md={8}><Card><Statistic title="Doctores con cita" value={new Set((appointments.data ?? []).map(a=>a.doctorName)).size} prefix={<UserOutlined />} /></Card></Col></Row><Row gutter={[16,16]} style={{ marginTop:24 }}><Col xs={24} md={12}><Card title="Próxima cita">{upcoming ? <><Title level={4}>{upcoming.doctorName}</Title><Text>{new Date(`${upcoming.date}T00:00:00`).toLocaleDateString("es-PE", { dateStyle:"long" })} · {upcoming.time.slice(0,5)}</Text></> : <Empty description="No tienes próximas citas" />}</Card></Col><Col xs={24} md={12}><Card title="Recordatorios pendientes" extra={<BellOutlined />}>{upcoming ? <Text>Tu próxima cita es el {new Date(`${upcoming.date}T00:00:00`).toLocaleDateString("es-PE")} a las {upcoming.time.slice(0,5)}.</Text> : <Text type="secondary">No tienes recordatorios pendientes.</Text>}</Card></Col></Row></>;
+}

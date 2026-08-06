@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "../layouts/AppLayout";
 
 import { LoginPage } from "../features/auth/pages/LoginPage";
@@ -14,13 +14,27 @@ import { BrandingPage } from "../features/branding/pages/BrandingPage";
 import { OnboardingPage } from "../features/onboarding/pages/OnboardingPage";
 import { UsersPage } from "../features/users/pages/UsersPage";
 import { SpecialtiesPage } from "../features/specialties/pages/SpecialtiesPage";
+import { MyAgendaPage } from "../features/agenda/pages/MyAgendaPage";
+import { ClinicAgendaPage } from "../features/agenda/pages/ClinicAgendaPage";
+import { BillingPage } from "../features/billing/pages/BillingPage";
 
 import { MarketplaceDoctorsPage } from "../features/marketplace/pages/MarketplaceDoctorsPage";
 import { MarketplaceDoctorDetailPage } from "../features/marketplace/pages/MarketplaceDoctorDetailPage";
+import { MarketplaceClinicsPage } from "../features/marketplace/pages/MarketplaceClinicPage";
+import { MarketplaceClinicDetailPage } from "../features/marketplace/pages/MarketplaceClinicsDetailPage";
+import { ClinicMarketplaceProfilePage } from "../features/marketplace/pages/ClinicMarketplaceProfilePage";
+import { MyMarketplaceRedirectPage } from "../features/marketplace/pages/MyMarketplaceRedirectPage";
 
 import { PrivateRoute } from "./PrivateRoute";
 import { RoleRoute } from "./RoleRoute";
 import { AccessDeniedPage } from "../pages/AccessDeniedPage";
+import { HomeRedirect } from "./HomeRedirect";
+import { PatientAccessPage } from "../features/patient/pages/PatientAccessPage";
+import { PatientLoginPage } from "../features/patient/pages/PatientLoginPage";
+import { PatientDashboardPage } from "../features/patient/pages/PatientDashboardPage";
+import { PatientAppointmentsPage } from "../features/patient/pages/PatientAppointmentsPage";
+import { PatientAgendaPage } from "../features/patient/pages/PatientAgendaPage";
+import { PatientProfilePage } from "../features/patient/pages/PatientProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +49,8 @@ export const router = createBrowserRouter([
     path: "/access-denied",
     element: <AccessDeniedPage />,
   },
+  { path: "/access", element: <PatientAccessPage /> },
+  { path: "/patient/login", element: <PatientLoginPage /> },
 
   // Marketplace público
   {
@@ -47,6 +63,15 @@ export const router = createBrowserRouter([
   },
 
   {
+    path: "/marketplace/clinics",
+    element: <MarketplaceClinicsPage />,
+  },
+  {
+    path: "/marketplace/clinics/:slug",
+    element: <MarketplaceClinicDetailPage />,
+  },
+
+  {
     element: <PrivateRoute />,
     children: [
       {
@@ -55,12 +80,16 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="/dashboard" replace />,
+            element: <HomeRedirect />,
           },
           {
             path: "dashboard",
             element: <DashboardPage />,
           },
+          { path: "patient/dashboard", element: <PatientDashboardPage /> },
+          { path: "patient/appointments", element: <PatientAppointmentsPage /> },
+          { path: "patient/agenda", element: <PatientAgendaPage /> },
+          { path: "patient/profile", element: <PatientProfilePage /> },
           {
             path: "onboarding",
             element: <OnboardingPage />,
@@ -92,6 +121,22 @@ export const router = createBrowserRouter([
                 path: "doctors/:id",
                 element: <DoctorProfilePage />,
               },
+              {
+                path: "clinic-profile",
+                element: <ClinicMarketplaceProfilePage />,
+              },
+              {
+                path: "my-marketplace",
+                element: <MyMarketplaceRedirectPage />,
+              },
+              {
+                path: "agenda-clinica",
+                element: <ClinicAgendaPage />,
+              },
+              {
+                path: "billing",
+                element: <BillingPage />,
+              },
             ],
           },
           {
@@ -114,6 +159,15 @@ export const router = createBrowserRouter([
               {
                 path: "appointments",
                 element: <AppointmentsPage />,
+              },
+            ],
+          },
+          {
+            element: <RoleRoute allowedRoles={["DOCTOR"]} />,
+            children: [
+              {
+                path: "agenda",
+                element: <MyAgendaPage />,
               },
             ],
           },

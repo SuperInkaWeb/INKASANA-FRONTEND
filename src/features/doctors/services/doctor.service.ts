@@ -1,3 +1,4 @@
+import axios from "axios";
 import { api } from "../../../shared/api/api";
 import type {
   CreateDoctorRequest,
@@ -25,6 +26,27 @@ export const doctorService = {
 
   create: async (payload: CreateDoctorRequest) => {
     const { data } = await api.post<Doctor>(BASE_URL, payload);
+    return data;
+  },
+
+  uploadPhoto: async (id: string, file: File) => {
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    const token = localStorage.getItem("access_token");
+
+    // Usamos axios "puro" (no la instancia `api`) para esta petición,
+    // porque `api` fuerza Content-Type: application/json por defecto y
+    // eso rompería el "boundary" que el navegador necesita generar
+    // automáticamente para multipart/form-data.
+    const { data } = await axios.post<Doctor>(
+      `${api.defaults.baseURL}${BASE_URL}/${id}/photo`,
+      formData,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      }
+    );
+
     return data;
   },
 

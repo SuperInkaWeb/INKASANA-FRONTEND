@@ -13,6 +13,7 @@ import {
   Spin,
   Tag,
   Typography,
+  Avatar,
 } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,6 +21,16 @@ import { doctorService } from "../services/doctor.service";
 import type { DoctorStatus } from "../types/doctor.types";
 
 const { Title, Text, Paragraph } = Typography;
+
+const DAY_LABELS: Record<string, string> = {
+  MONDAY: "Lunes",
+  TUESDAY: "Martes",
+  WEDNESDAY: "Miércoles",
+  THURSDAY: "Jueves",
+  FRIDAY: "Viernes",
+  SATURDAY: "Sábado",
+  SUNDAY: "Domingo",
+};
 
 export function DoctorProfilePage() {
   const { id } = useParams();
@@ -75,7 +86,11 @@ export function DoctorProfilePage() {
       <Card>
         <Space direction="vertical" size="middle" style={{ width: "100%" }}>
           <Space align="center">
-            <UserOutlined style={{ fontSize: 32 }} />
+            <Avatar
+              size={48}
+              src={doctor.profileImageUrl || undefined}
+              icon={<UserOutlined />}
+            />
             <div>
               <Title level={3} style={{ margin: 0 }}>
                 {doctor.fullName}
@@ -138,6 +153,26 @@ export function DoctorProfilePage() {
           <Descriptions.Item label="Duración de consulta">
             {doctor.consultationDurationMinutes
               ? `${doctor.consultationDurationMinutes} minutos`
+              : "N/A"}
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Días disponibles">
+            {doctor.availableDays && doctor.availableDays.length > 0 ? (
+              <Space wrap>
+                {doctor.availableDays.map((day) => (
+                  <Tag key={day} color="purple">
+                    {DAY_LABELS[day] ?? day}
+                  </Tag>
+                ))}
+              </Space>
+            ) : (
+              "N/A"
+            )}
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Horario de atención">
+            {doctor.availableStartTime && doctor.availableEndTime
+              ? `${doctor.availableStartTime} - ${doctor.availableEndTime}`
               : "N/A"}
           </Descriptions.Item>
         </Descriptions>

@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { brandingService } from "../../branding/services/branding.service";
+import { useAuthStore } from "../../../app/store/auth.store";
 
 export function useOnboardingGuard(isAuthenticated: boolean) {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [checking, setChecking] = useState(false);
+  const { role, roles, scope } = useAuthStore();
+  const isPatient = role === "PATIENT" || roles.includes("PATIENT");
 
   useEffect(() => {
     const checkOnboarding = async () => {
-      if (!isAuthenticated) return;
+      if (!isAuthenticated || isPatient || scope !== "TENANT") return;
 
       if (location.pathname === "/onboarding") return;
       if (location.pathname === "/login") return;
@@ -32,7 +35,7 @@ export function useOnboardingGuard(isAuthenticated: boolean) {
     };
 
     checkOnboarding();
-  }, [isAuthenticated, location.pathname, navigate]);
+  }, [isAuthenticated, isPatient, scope, location.pathname, navigate]);
 
   return { checking };
 }

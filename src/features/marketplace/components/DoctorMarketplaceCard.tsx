@@ -4,6 +4,16 @@ import { useNavigate } from "react-router-dom";
 
 import type { MarketplaceDoctor } from "../types/marketplace.types";
 
+const DAY_LABELS: Record<string, string> = {
+  MONDAY: "Lunes",
+  TUESDAY: "Martes",
+  WEDNESDAY: "Miércoles",
+  THURSDAY: "Jueves",
+  FRIDAY: "Viernes",
+  SATURDAY: "Sábado",
+  SUNDAY: "Domingo",
+};
+
 const { Title, Text } = Typography;
 
 type Props = {
@@ -45,12 +55,12 @@ export function DoctorMarketplaceCard({ doctor }: Props) {
           >
             {doctor.displayName}
           </Title>
-
-          {doctor.headline && (
-            <Text type="secondary">{doctor.headline}</Text>
-          )}
         </div>
       </Space>
+
+      {doctor.headline && (
+        <Tag color="green">Especialidad: {doctor.headline}</Tag>
+      )}
 
       <Space wrap>
         {doctor.city && (
@@ -73,7 +83,7 @@ export function DoctorMarketplaceCard({ doctor }: Props) {
           {doctor.consultationPrice !== null &&
             doctor.consultationPrice !== undefined && (
               <Text strong>
-                Consulta: ${doctor.consultationPrice}
+                Consulta: S/ {doctor.consultationPrice}
               </Text>
             )}
 
@@ -84,6 +94,22 @@ export function DoctorMarketplaceCard({ doctor }: Props) {
           )}
         </Space>
       ) : null}
+
+      {doctor.availableDays && doctor.availableDays.length > 0 && (
+        <Space wrap size={4}>
+          {doctor.availableDays.map((day) => (
+            <Tag key={day} color="purple">
+              {DAY_LABELS[day] ?? day}
+            </Tag>
+          ))}
+        </Space>
+      )}
+
+      {doctor.availableStartTime && doctor.availableEndTime && (
+        <Text type="secondary">
+          Horario: {doctor.availableStartTime} - {doctor.availableEndTime}
+        </Text>
+      )}
 
       <Button type="primary" block onClick={goToProfile}>
         Ver perfil

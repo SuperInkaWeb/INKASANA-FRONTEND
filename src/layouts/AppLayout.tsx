@@ -1,8 +1,11 @@
 import {
   CalendarOutlined,
+  CreditCardOutlined,
+  ClockCircleOutlined,
   DashboardOutlined,
   MedicineBoxOutlined,
   SettingOutlined,
+  ShopOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -19,8 +22,9 @@ export function AppLayout() {
   const { roles, role } = useAuthStore();
 
   const currentRoles = roles.length > 0 ? roles : role ? [role] : [];
+  const isPatient = currentRoles.includes("PATIENT");
 
-  const selectedKey = location.pathname.split("/")[1] || "dashboard";
+  const selectedKey = location.pathname.replace(/^\//, "") || "dashboard";
 
   const canManageUsers = currentRoles.some((role) =>
     ["OWNER", "ADMIN"].includes(role)
@@ -42,7 +46,22 @@ export function AppLayout() {
     ["OWNER", "ADMIN"].includes(role)
   );
 
-  const menuItems = [
+  const canManageClinicProfile = currentRoles.some((role) =>
+    ["OWNER", "ADMIN"].includes(role)
+  );
+
+  const canManageOwnAgenda = currentRoles.includes("DOCTOR");
+
+  const canManageClinicAgenda = currentRoles.some((role) =>
+    ["OWNER", "ADMIN"].includes(role)
+  );
+
+  const menuItems = isPatient ? [
+    { key: "patient/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
+    { key: "patient/appointments", icon: <CalendarOutlined />, label: "Citas" },
+    { key: "patient/agenda", icon: <ClockCircleOutlined />, label: "Mi agenda" },
+    { key: "patient/profile", icon: <UserOutlined />, label: "Perfil" },
+  ] : [
     {
       key: "dashboard",
       icon: <DashboardOutlined />,
@@ -94,6 +113,26 @@ export function AppLayout() {
         ]
       : []),
 
+    ...(canManageOwnAgenda
+      ? [
+          {
+            key: "agenda",
+            icon: <ClockCircleOutlined />,
+            label: "Mi Agenda",
+          },
+        ]
+      : []),
+
+    ...(canManageClinicAgenda
+      ? [
+          {
+            key: "agenda-clinica",
+            icon: <ClockCircleOutlined />,
+            label: "Agenda de la Clínica",
+          },
+        ]
+      : []),
+
     ...(canManageBranding
       ? [
           {
@@ -104,11 +143,35 @@ export function AppLayout() {
         ]
       : []),
 
+    ...(canManageUsers
+      ? [
+          {
+            key: "billing",
+            icon: <CreditCardOutlined />,
+            label: "Facturación",
+          },
+        ]
+      : []),
+
     {
       key: "profile",
       icon: <UserOutlined />,
       label: "Perfil",
     },
+    ...(canManageClinicProfile
+      ? [
+          {
+            key: "my-marketplace",
+            icon: <ShopOutlined />,
+            label: "Mi Marketplace",
+          },
+          {
+            key: "clinic-profile",
+            icon: <SettingOutlined />,
+            label: "Editar Marketplace",
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -116,7 +179,7 @@ export function AppLayout() {
       <Sider width={260}>
         <div style={{ padding: 20 }}>
           <Title level={4} style={{ color: "white", margin: 0 }}>
-            Medical SaaS
+            HealthHub 360
           </Title>
 
           <Text style={{ color: "rgba(255,255,255,0.65)" }}>
@@ -141,7 +204,7 @@ export function AppLayout() {
             borderBottom: "1px solid #f0f0f0",
           }}
         >
-          <Text strong>Panel administrativo</Text>
+          <Text strong>{isPatient ? "Portal del paciente" : "Panel administrativo"}</Text>
         </Header>
 
         <Content style={{ padding: 24 }}>

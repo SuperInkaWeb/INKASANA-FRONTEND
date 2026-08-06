@@ -1,13 +1,274 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Poppins, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   background: #f5f7fb;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* En el perfil público, la clínica ya se identifica en la barra superior y
+   en "Sobre nosotros"; este bloque repetía innecesariamente su nombre y datos. */
+.clinic-carousel .slick-arrow {
+  width: 38px;
+  height: 38px;
+  z-index: 2;
+  color: #64748b;
+  background: rgb(255 255 255 / 78%);
+  border-radius: 50%;
+}
+
+.clinic-carousel .slick-arrow:hover {
+  color: #0868b8;
+  background: #fff;
+}
+
+.marketplace-page #clinicas,
+.marketplace-page #hospitales,
+.marketplace-page #blog,
+#specialties,
+#blog {
+  text-align: center;
+}
+
+.marketplace-page #clinicas .ant-row,
+.marketplace-page #hospitales .ant-row,
+#specialties .ant-row {
+  text-align: left;
+}
+
+.subscription-section {
+  margin-top: 64px;
+  padding: 56px 0 8px;
+  border-top: 1px solid #dbe6f0;
+}
+
+.subscription-section__intro {
+  max-width: 680px;
+  margin: 0 auto 32px;
+  text-align: center;
+}
+
+.subscription-section__intro .ant-typography {
+  color: #35475b;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.subscription-section__eyebrow {
+  color: #0868b8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.subscription-section__intro h2 {
+  margin-top: 8px;
+  color: #164f82;
+}
+
+.subscription-plan {
+  position: relative;
+  display: flex;
+  min-height: 358px;
+  flex-direction: column;
+  padding: 28px;
+  border: 1px solid #dbe6f0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.subscription-plan--featured {
+  border: 2px solid #0868b8;
+  box-shadow: 0 12px 26px rgb(8 104 184 / 14%);
+}
+
+.subscription-plan h3 {
+  margin-bottom: 8px;
+  color: #164f82;
+}
+
+.subscription-plan__badge {
+  position: absolute;
+  top: -13px;
+  right: 22px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: #0868b8;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.subscription-plan__price {
+  margin: 8px 0 18px;
+  color: #0868b8;
+  font-weight: 700;
+}
+
+.subscription-plan ul {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.subscription-plan li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  color: #35475b;
+}
+
+.subscription-plan li .anticon {
+  margin-top: 3px;
+  color: #16803d;
+}
+
+.subscription-section--graphite {
+  background: radial-gradient(circle at 50% -20%, #363c45 0, #15171a 43%, #101113 100%);
+  border-top-color: #2d3238;
+}
+
+.subscription-section--metallic-blue {
+  background: radial-gradient(circle at 50% -35%, #0a7cda 0, #064789 38%, #031b43 100%);
+  border-top-color: #0f73bb;
+}
+
+.subscription-section--graphite .subscription-section__intro .ant-typography,
+.subscription-section--metallic-blue .subscription-section__intro .ant-typography,
+.subscription-section--graphite .subscription-section__intro h2,
+.subscription-section--metallic-blue .subscription-section__intro h2,
+.subscription-section--graphite .subscription-section__eyebrow,
+.subscription-section--metallic-blue .subscription-section__eyebrow {
+  color: #fff;
+}
+
+.subscription-section--graphite .subscription-plan,
+.subscription-section--metallic-blue .subscription-plan {
+  border-color: rgb(255 255 255 / 25%);
+  background: rgb(10 15 25 / 72%);
+  box-shadow: 0 16px 30px rgb(0 0 0 / 22%);
+}
+
+.subscription-section--graphite .subscription-plan--featured {
+  border-color: #f1f5f9;
+}
+
+.subscription-section--metallic-blue .subscription-plan--featured {
+  border-color: #20e7db;
+  box-shadow: 0 0 0 1px rgb(32 231 219 / 42%), 0 16px 32px rgb(0 10 45 / 42%);
+}
+
+.subscription-section--graphite .subscription-plan h3,
+.subscription-section--metallic-blue .subscription-plan h3,
+.subscription-section--graphite .subscription-plan .ant-typography,
+.subscription-section--metallic-blue .subscription-plan .ant-typography,
+.subscription-section--graphite .subscription-plan li,
+.subscription-section--metallic-blue .subscription-plan li,
+.subscription-section--graphite .subscription-plan__price,
+.subscription-section--metallic-blue .subscription-plan__price {
+  color: #fff;
+}
+
+.subscription-section--graphite .subscription-plan li .anticon {
+  color: #e2e8f0;
+}
+
+.subscription-section--metallic-blue .subscription-plan li .anticon {
+  color: #2cf4d6;
+  filter: drop-shadow(0 0 4px rgb(44 244 214 / 75%));
+}
+
+.subscription-section--graphite .subscription-plan__badge {
+  background: #314354;
+}
+
+.subscription-section--metallic-blue .subscription-plan__badge {
+  background: #0052ad;
+}
+
+.subscription-section--metallic-blue .subscription-plan--featured .ant-btn-primary {
+  background: linear-gradient(90deg, #086bd2, #0876e8);
+  border-color: #28e9d8;
+}
+
+.subscription-theme-option {
+  display: flex;
+  width: 100%;
+  min-height: 170px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  color: #172033;
+  text-align: left;
+  border: 1px solid #d8e0ea;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.subscription-theme-option--selected {
+  border: 2px solid #1677ff;
+  box-shadow: 0 0 0 3px rgb(22 119 255 / 12%);
+}
+
+.subscription-theme-option__preview {
+  display: flex;
+  gap: 5px;
+  height: 74px;
+  padding: 12px;
+  margin: -14px -14px 8px;
+  background: #f5f7fb;
+}
+
+.subscription-theme-option__preview span {
+  flex: 1;
+  border: 1px solid #dbe6f0;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.subscription-theme-option--graphite .subscription-theme-option__preview {
+  background: #15171a;
+}
+
+.subscription-theme-option--graphite .subscription-theme-option__preview span {
+  border-color: #59616b;
+  background: #25282d;
+}
+
+.subscription-theme-option--metallic-blue .subscription-theme-option__preview {
+  background: linear-gradient(120deg, #075cac, #031b43);
+}
+
+.subscription-theme-option--metallic-blue .subscription-theme-option__preview span {
+  border-color: #26ddd6;
+  background: rgb(6 63 128 / 85%);
+}
+
+.subscription-theme-option small {
+  color: #64748b;
+}
+
+@media (max-width: 767px) {
+  .subscription-section {
+    margin-top: 42px;
+    padding-top: 42px;
+  }
+
+  .subscription-plan {
+    min-height: 0;
+  }
 }

@@ -27,6 +27,10 @@ export type Doctor = {
   bio?: string | null;
   consultationPrice?: number | null;
   consultationDurationMinutes?: number | null;
+  profileImageUrl?: string | null;
+  availableDays?: string[];
+  availableStartTime?: string | null;
+  availableEndTime?: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -42,6 +46,10 @@ export type CreateDoctorRequest = {
   bio?: string;
   consultationPrice?: number;
   consultationDurationMinutes?: number;
+  profileImageUrl?: string;
+  availableDays?: string[];
+  availableStartTime?: string;
+  availableEndTime?: string;
 };
 
 export type UpdateDoctorRequest = Partial<CreateDoctorRequest>;

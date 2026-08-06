@@ -5,6 +5,7 @@ import { message } from "antd";
 import { useAuthStore } from "../../../app/store/auth.store";
 import { setAuthToken } from "../../../shared/api/api";
 import { auth0TenantLogin } from "../api/auth.api";
+import { patientPortalApi } from "../../patient/api/patient-portal.api";
 
 type AuthInitializerProps = {
   children: React.ReactNode;
@@ -31,15 +32,13 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
 
         const existingToken = localStorage.getItem("access_token");
         const existingSchema = localStorage.getItem("schema");
+        const existingScope = localStorage.getItem("scope");
 
-        if (existingToken && existingSchema) {
+        if (
+          existingToken &&
+          (existingSchema || existingScope === "PLATFORM")
+        ) {
           setAuthToken(existingToken);
-          return;
-        }
-
-        const organizationSlug = localStorage.getItem("organization_slug");
-
-        if (!organizationSlug) {
           return;
         }
 
@@ -65,26 +64,35 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
           },
         });
 
-        const session = await auth0TenantLogin(
-          organizationSlug,
-          auth0Token,
-          email,
-          auth0Id
-        );
+        const patientFlow = localStorage.getItem("auth_flow") === "PATIENT";
+        const organizationSlug = localStorage.getItem("organization_slug");
+        if (!patientFlow && !organizationSlug) return;
+
+        const session = patientFlow
+          ? await patientPortalApi.login(auth0Token, email, auth0Id)
+          : await auth0TenantLogin(organizationSlug!, auth0Token, email, auth0Id);
 
         setAuthToken(session.accessToken);
 
         setAuthData({
           token: session.accessToken,
-          role: session.user.role,
-          roles: [session.user.role],
+          role: patientFlow ? "PATIENT" : session.user.role,
+          roles: [patientFlow ? "PATIENT" : session.user.role],
           userId: session.user.id,
-          orgId: session.organization.id,
-          schema: session.organization.schemaName,
-          scope: "TENANT",
+          orgId: session.organization?.id || null,
+          schema: session.organization?.schemaName || null,
+          scope: patientFlow ? "PLATFORM" : "TENANT",
         });
 
         localStorage.removeItem("organization_slug");
+        localStorage.removeItem("auth_flow");
+
+        const postLoginPath = localStorage.getItem("post_login_path");
+        localStorage.removeItem("post_login_path");
+
+        if (postLoginPath?.startsWith("/") && !postLoginPath.startsWith("//")) {
+          window.location.assign(postLoginPath);
+        }
       } catch (error: any) {
         console.error("Error inicializando sesión:", error);
 

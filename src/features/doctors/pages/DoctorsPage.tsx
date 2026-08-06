@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Card,
   Form,
@@ -11,7 +12,13 @@ import {
   Space,
   Table,
   Tag,
+  TimePicker,
+  Typography,
+  Upload,
+  type UploadProps,
 } from "antd";
+import { InboxOutlined, UserOutlined } from "@ant-design/icons";
+import dayjs, { Dayjs } from "dayjs";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +33,15 @@ import type {
 import { getActiveSpecialties } from "../../specialties/api/specialties.api";
 import { getUsers } from "../../users/api/users.api";
 import type { TenantUser } from "../../users/types/user.types";
+
+type DoctorFormValues = CreateDoctorRequest & {
+  availableHours?: [Dayjs, Dayjs] | null;
+};
+
+const { Text } = Typography;
+
+const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_PHOTO_SIZE_MB = 5;
 
 function getErrorMessage(error: unknown, fallback: string) {
   if (typeof error === "object" && error !== null && "response" in error) {
@@ -49,7 +65,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 export function DoctorsPage() {
-  const [form] = Form.useForm<CreateDoctorRequest>();
+  const [form] = Form.useForm<DoctorFormValues>();
   const [rejectForm] = Form.useForm<{ reason: string }>();
 
   const queryClient = useQueryClient();
@@ -63,6 +79,10 @@ export function DoctorsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+
+  const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectingDoctor, setRejectingDoctor] = useState<Doctor | null>(null);
@@ -193,6 +213,8 @@ export function DoctorsPage() {
     form.setFieldsValue({
       specialtyIds: [],
     });
+    setPendingPhotoFile(null);
+    setPhotoPreviewUrl(null);
     setIsModalOpen(true);
   };
 
@@ -210,14 +232,26 @@ export function DoctorsPage() {
       consultationPrice: doctor.consultationPrice ?? undefined,
       consultationDurationMinutes:
         doctor.consultationDurationMinutes ?? undefined,
+      availableDays: doctor.availableDays ?? [],
+      availableHours:
+        doctor.availableStartTime && doctor.availableEndTime
+          ? [
+              dayjs(doctor.availableStartTime, "HH:mm"),
+              dayjs(doctor.availableEndTime, "HH:mm"),
+            ]
+          : null,
     });
 
+    setPendingPhotoFile(null);
+    setPhotoPreviewUrl(null);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingDoctor(null);
+    setPendingPhotoFile(null);
+    setPhotoPreviewUrl(null);
     form.resetFields();
   };
 
@@ -233,26 +267,53 @@ export function DoctorsPage() {
     rejectForm.resetFields();
   };
 
-  const handleSubmit = (values: CreateDoctorRequest) => {
+  const handleSubmit = async (values: DoctorFormValues) => {
+    const { availableHours, ...rest } = values;
+
+    // La foto ya no se envía como texto: se sube por drag & drop y se
+    // asocia al doctor en un paso aparte, después de guardarlo (ver abajo).
     const payload: CreateDoctorRequest = {
-      ...values,
+      ...rest,
       fullName: values.fullName.trim(),
       specialtyIds: values.specialtyIds ?? [],
       licenseNumber: values.licenseNumber?.trim() || undefined,
       email: values.email?.trim().toLowerCase() || undefined,
       phone: values.phone?.trim() || undefined,
       bio: values.bio?.trim() || undefined,
+      availableDays: values.availableDays ?? [],
+      availableStartTime: availableHours?.[0]
+        ? availableHours[0].format("HH:mm")
+        : undefined,
+      availableEndTime: availableHours?.[1]
+        ? availableHours[1].format("HH:mm")
+        : undefined,
     };
 
-    if (editingDoctor) {
-      updateMutation.mutate({
-        id: editingDoctor.id,
-        values: payload,
-      });
-      return;
-    }
+    try {
+      const savedDoctor = editingDoctor
+        ? await updateMutation.mutateAsync({
+            id: editingDoctor.id,
+            values: payload,
+          })
+        : await createMutation.mutateAsync(payload);
 
-    createMutation.mutate(payload);
+      if (pendingPhotoFile) {
+        try {
+          setIsUploadingPhoto(true);
+          await doctorService.uploadPhoto(savedDoctor.id, pendingPhotoFile);
+          message.success("Foto del doctor actualizada");
+          refresh();
+        } catch (error) {
+          message.error(
+            getErrorMessage(error, "No se pudo subir la foto del doctor")
+          );
+        } finally {
+          setIsUploadingPhoto(false);
+        }
+      }
+    } catch {
+      // El mensaje de error ya lo muestra el onError de cada mutación
+    }
   };
 
   const handleRejectSubmit = (values: { reason: string }) => {
@@ -486,7 +547,11 @@ export function DoctorsPage() {
         open={isModalOpen}
         onCancel={closeModal}
         onOk={() => form.submit()}
-        confirmLoading={createMutation.isPending || updateMutation.isPending}
+        confirmLoading={
+          createMutation.isPending ||
+          updateMutation.isPending ||
+          isUploadingPhoto
+        }
         okText={editingDoctor ? "Actualizar" : "Guardar"}
         cancelText="Cancelar"
         width={720}
@@ -592,6 +657,79 @@ export function DoctorsPage() {
               style={{ width: "100%" }}
               placeholder="Ej: 30"
             />
+          </Form.Item>
+
+          <Form.Item label="Foto del doctor">
+            <Upload.Dragger
+              accept={ALLOWED_PHOTO_TYPES.join(",")}
+              multiple={false}
+              maxCount={1}
+              showUploadList={false}
+              disabled={isUploadingPhoto}
+              beforeUpload={((file: File) => {
+                if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
+                  message.error("Solo se permiten imágenes JPG, PNG o WEBP");
+                  return Upload.LIST_IGNORE;
+                }
+
+                if (file.size / 1024 / 1024 > MAX_PHOTO_SIZE_MB) {
+                  message.error(
+                    `La imagen no puede superar los ${MAX_PHOTO_SIZE_MB} MB`
+                  );
+                  return Upload.LIST_IGNORE;
+                }
+
+                setPendingPhotoFile(file);
+                setPhotoPreviewUrl(URL.createObjectURL(file));
+
+                // Evitamos que antd suba el archivo por su cuenta: lo
+                // subimos nosotros mismos después de guardar el doctor.
+                return false;
+              }) as UploadProps["beforeUpload"]}
+            >
+              <Space
+                direction="vertical"
+                align="center"
+                style={{ width: "100%", padding: "12px 0" }}
+              >
+                <Avatar
+                  size={80}
+                  src={photoPreviewUrl || editingDoctor?.profileImageUrl || undefined}
+                  icon={<UserOutlined />}
+                />
+
+                <Space direction="vertical" align="center" size={0}>
+                  <span>
+                    <InboxOutlined style={{ marginRight: 6 }} />
+                    Arrastra una foto aquí o haz clic para seleccionarla
+                  </span>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    JPG, PNG o WEBP · máx. {MAX_PHOTO_SIZE_MB} MB
+                  </Text>
+                </Space>
+              </Space>
+            </Upload.Dragger>
+          </Form.Item>
+
+          <Form.Item label="Días disponibles" name="availableDays">
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Selecciona los días"
+              options={[
+                { label: "Lunes", value: "MONDAY" },
+                { label: "Martes", value: "TUESDAY" },
+                { label: "Miércoles", value: "WEDNESDAY" },
+                { label: "Jueves", value: "THURSDAY" },
+                { label: "Viernes", value: "FRIDAY" },
+                { label: "Sábado", value: "SATURDAY" },
+                { label: "Domingo", value: "SUNDAY" },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item label="Horario de atención" name="availableHours">
+            <TimePicker.RangePicker style={{ width: "100%" }} format="HH:mm" />
           </Form.Item>
         </Form>
       </Modal>

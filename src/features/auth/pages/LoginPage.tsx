@@ -16,6 +16,9 @@ const normalizeSlug = (value?: string) =>
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 
+const getSafeReturnPath = (value: string | null) =>
+  value?.startsWith("/") && !value.startsWith("//") ? value : "/dashboard";
+
 export function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -27,6 +30,7 @@ export function LoginPage() {
     useAuthStore();
 
   const slugFromUrl = normalizeSlug(searchParams.get("slug") || "");
+  const returnTo = getSafeReturnPath(searchParams.get("returnTo"));
 
   const clearLocalSession = () => {
     localStorage.removeItem("organization_slug");
@@ -47,6 +51,7 @@ export function LoginPage() {
 
       clearLocalSession();
       localStorage.setItem("organization_slug", slug);
+      localStorage.setItem("post_login_path", returnTo);
 
       await loginWithRedirect({
         authorizationParams: {
@@ -59,7 +64,7 @@ export function LoginPage() {
           prompt: "login",
         },
         appState: {
-          returnTo: "/dashboard",
+          returnTo,
           organizationSlug: slug,
         },
       });
@@ -88,7 +93,7 @@ export function LoginPage() {
   }
 
   if (isAuthenticated && hasInternalSession) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={returnTo} replace />;
   }
 
   return (
