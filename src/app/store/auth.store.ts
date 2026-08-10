@@ -9,6 +9,7 @@ export type UserRole =
   | "PATIENT";
 
 export type AuthScope = "PLATFORM" | "TENANT";
+export type SessionStatus = "checking" | "ready" | "failed";
 
 type AuthState = {
   token: string | null;
@@ -19,6 +20,7 @@ type AuthState = {
   schema: string | null;
   scope: AuthScope | null;
   isAuthenticated: boolean;
+  sessionStatus: SessionStatus;
 
   setAuthData: (data: {
     token: string;
@@ -32,6 +34,7 @@ type AuthState = {
 
   setToken: (token: string) => void;
   setRoles: (roles: UserRole[]) => void;
+  setSessionStatus: (status: SessionStatus) => void;
   logout: () => void;
 };
 
@@ -44,6 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   schema: localStorage.getItem("schema"),
   scope: (localStorage.getItem("scope") as AuthScope) || null,
   isAuthenticated: Boolean(localStorage.getItem("access_token")),
+  sessionStatus: localStorage.getItem("access_token") ? "ready" : "checking",
 
   setAuthData: ({ token, role, roles, userId, orgId, schema, scope }) => {
     localStorage.setItem("access_token", token);
@@ -89,6 +93,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  setSessionStatus: (sessionStatus) => set({ sessionStatus }),
+
   logout: () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("roles");
@@ -107,6 +113,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       schema: null,
       scope: null,
       isAuthenticated: false,
+      sessionStatus: "failed",
     });
   },
 }));

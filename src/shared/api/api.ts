@@ -5,7 +5,9 @@ const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export const api = axios.create({
   baseURL,
-  timeout: 60000,
+  // Un minuto bloquea la interfaz cuando Render est\u00e1 detenido o la API no responde.
+  // La aplicaci\u00f3n debe fallar r\u00e1pido y permitir que el usuario reintente.
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },

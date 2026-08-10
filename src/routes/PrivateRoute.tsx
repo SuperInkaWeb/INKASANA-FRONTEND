@@ -6,11 +6,14 @@ import { useAuthStore } from "../app/store/auth.store";
 
 export function PrivateRoute() {
   const { isAuthenticated, isLoading } = useAuth0();
-  const { isAuthenticated: hasInternalSession } = useAuthStore();
+  const {
+    isAuthenticated: hasInternalSession,
+    sessionStatus,
+  } = useAuthStore();
 
   const { checking } = useOnboardingGuard(isAuthenticated);
 
-  if (isLoading || (isAuthenticated && !hasInternalSession) || checking) {
+  if (isLoading || (isAuthenticated && sessionStatus === "checking") || checking) {
     return (
       <div
         style={{
@@ -25,7 +28,7 @@ export function PrivateRoute() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !hasInternalSession) {
     return <Navigate to="/login" replace />;
   }
 

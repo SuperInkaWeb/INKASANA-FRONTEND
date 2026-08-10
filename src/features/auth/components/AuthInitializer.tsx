@@ -15,7 +15,7 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
   const { isAuthenticated, getAccessTokenSilently, isLoading, user } =
     useAuth0();
 
-  const { setAuthData, logout } = useAuthStore();
+  const { setAuthData, logout, setSessionStatus } = useAuthStore();
 
   useEffect(() => {
     const loadSession = async () => {
@@ -39,10 +39,12 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
           (existingSchema || existingScope === "PLATFORM")
         ) {
           setAuthToken(existingToken);
+          setSessionStatus("ready");
           return;
         }
 
         if (!user) {
+          setSessionStatus("failed");
           return;
         }
 
@@ -66,7 +68,10 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
 
         const patientFlow = localStorage.getItem("auth_flow") === "PATIENT";
         const organizationSlug = localStorage.getItem("organization_slug");
-        if (!patientFlow && !organizationSlug) return;
+        if (!patientFlow && !organizationSlug) {
+          setSessionStatus("failed");
+          return;
+        }
 
         const session = patientFlow
           ? await patientPortalApi.login(auth0Token, email, auth0Id)
@@ -83,6 +88,7 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
           schema: session.organization?.schemaName || null,
           scope: patientFlow ? "PLATFORM" : "TENANT",
         });
+        setSessionStatus("ready");
 
         localStorage.removeItem("organization_slug");
         localStorage.removeItem("auth_flow");
@@ -112,6 +118,7 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
     getAccessTokenSilently,
     setAuthData,
     logout,
+    setSessionStatus,
     user,
   ]);
 
