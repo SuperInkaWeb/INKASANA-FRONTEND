@@ -27,6 +27,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuthStore } from "../../../app/store/auth.store";
 
 // Importar imágenes generales
 import citaImage from "../../../assets/cita.png.png";
@@ -98,6 +99,13 @@ const getSpecialtyImage = (specialtyName: string): string => {
 export function MarketplaceClinicDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { token, role, roles } = useAuthStore();
+  // Esta página es pública, pero puede abrirse desde cualquier dashboard.
+  // Usamos el token persistido como fuente de verdad para no perder el estado
+  // visual de la sesión al navegar desde el portal del paciente o de la clínica.
+  const hasActiveSession = Boolean(token || localStorage.getItem("access_token"));
+  const isPatient = role === "PATIENT" || roles.includes("PATIENT");
+  const dashboardPath = isPatient ? "/patient/dashboard" : "/dashboard";
   
   const [view, setView] = useState<View>("home");
   const [name, setName] = useState("");
@@ -425,9 +433,9 @@ export function MarketplaceClinicDetailPage() {
               background: appearance.loginButton ?? blue,
               borderColor: appearance.loginButton ?? blue
             }}
-            onClick={() => navigate("/access")}
+            onClick={() => navigate(hasActiveSession ? dashboardPath : "/access")}
           >
-           <strong>Iniciar sesión</strong> 
+           <strong>{hasActiveSession ? "Dashboard" : "Iniciar sesión"}</strong> 
           </Button>
           
           <Button 
