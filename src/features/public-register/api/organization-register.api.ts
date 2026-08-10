@@ -3,7 +3,7 @@ import { api } from "../../../shared/api/api";
 export type CreateOrganizationRequest = {
   name: string;
   slug: string;
-  type: "CLINIC" | "HOSPITAL";
+  type: "CLINIC";
   email: string;
   phone?: string;
   address?: string;
@@ -18,7 +18,7 @@ export type OrganizationResponse = {
   name: string;
   slug: string;
   schemaName: string;
-  type: "CLINIC" | "HOSPITAL";
+  type: "CLINIC";
   status: string;
   email: string;
   phone?: string;

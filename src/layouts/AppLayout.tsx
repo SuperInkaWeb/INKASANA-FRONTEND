@@ -60,6 +60,7 @@ export function AppLayout() {
     { key: "patient/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
     { key: "patient/appointments", icon: <CalendarOutlined />, label: "Citas" },
     { key: "patient/agenda", icon: <ClockCircleOutlined />, label: "Mi agenda" },
+    { key: "patient/marketplace", icon: <ShopOutlined />, label: "Marketplace" },
     { key: "patient/profile", icon: <UserOutlined />, label: "Perfil" },
   ] : [
     {

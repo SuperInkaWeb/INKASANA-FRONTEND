@@ -35,6 +35,7 @@ import { PatientDashboardPage } from "../features/patient/pages/PatientDashboard
 import { PatientAppointmentsPage } from "../features/patient/pages/PatientAppointmentsPage";
 import { PatientAgendaPage } from "../features/patient/pages/PatientAgendaPage";
 import { PatientProfilePage } from "../features/patient/pages/PatientProfilePage";
+import { PatientMarketplacePage } from "../features/patient/pages/PatientMarketplacePage";
 
 export const router = createBrowserRouter([
   {
@@ -90,6 +91,7 @@ export const router = createBrowserRouter([
           { path: "patient/appointments", element: <PatientAppointmentsPage /> },
           { path: "patient/agenda", element: <PatientAgendaPage /> },
           { path: "patient/profile", element: <PatientProfilePage /> },
+          { path: "patient/marketplace", element: <PatientMarketplacePage /> },
           {
             path: "onboarding",
             element: <OnboardingPage />,

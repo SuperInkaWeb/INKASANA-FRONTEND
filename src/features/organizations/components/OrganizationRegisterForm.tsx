@@ -111,10 +111,7 @@ export function OrganizationRegisterForm() {
           rules={[{ required: true, message: "Selecciona el tipo" }]}
         >
           <Select
-            options={[
-              { label: "Clínica", value: "CLINIC" },
-              { label: "Hospital", value: "HOSPITAL" },
-            ]}
+            options={[{ label: "Clínica", value: "CLINIC" }]}
           />
         </Form.Item>
 

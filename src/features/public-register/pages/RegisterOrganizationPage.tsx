@@ -146,10 +146,7 @@ export function RegisterOrganizationPage() {
             rules={[{ required: true, message: "Selecciona el tipo" }]}
           >
             <Select
-              options={[
-                { value: "CLINIC", label: "Clínica" },
-                { value: "HOSPITAL", label: "Hospital" },
-              ]}
+              options={[{ value: "CLINIC", label: "Clínica" }]}
             />
           </Form.Item>
 
