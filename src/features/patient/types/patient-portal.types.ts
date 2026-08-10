@@ -4,6 +4,7 @@ export type PatientPortalProfile = {
   firstName?: string | null;
   lastName?: string | null;
   dni?: string | null;
+  phone?: string | null;
   avatarUrl?: string | null;
 };
 
