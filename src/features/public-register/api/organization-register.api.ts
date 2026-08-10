@@ -2,12 +2,15 @@ import { api } from "../../../shared/api/api";
 
 export type CreateOrganizationRequest = {
   name: string;
+  slug: string;
   type: "CLINIC" | "HOSPITAL";
   email: string;
   phone?: string;
   address?: string;
   city?: string;
   country?: string;
+  ownerEmail: string;
+  ownerFullName: string;
 };
 
 export type OrganizationResponse = {

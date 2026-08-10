@@ -17,6 +17,15 @@ import {
 
 const { Title, Text } = Typography;
 
+const createSlug = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 export function RegisterOrganizationPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -30,12 +39,15 @@ export function RegisterOrganizationPage() {
 
       const organization = await createOrganization({
         name: values.name,
+        slug: createSlug(values.name),
         type: values.type,
         email: values.email,
         phone: values.phone,
         address: values.address,
         city: values.city,
         country: values.country,
+        ownerEmail: values.email,
+        ownerFullName: values.ownerFullName,
       });
 
       setCreatedOrg(organization);
@@ -150,6 +162,17 @@ export function RegisterOrganizationPage() {
             ]}
           >
             <Input placeholder="owner@clinica.com" />
+          </Form.Item>
+
+          <Form.Item
+            label="Nombre completo del OWNER"
+            name="ownerFullName"
+            rules={[
+              { required: true, message: "Ingresa el nombre del OWNER" },
+              { min: 3, message: "Mínimo 3 caracteres" },
+            ]}
+          >
+            <Input placeholder="María Pérez" />
           </Form.Item>
 
           <Form.Item label="Teléfono" name="phone">
