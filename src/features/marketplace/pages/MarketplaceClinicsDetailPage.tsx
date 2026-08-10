@@ -715,7 +715,7 @@ export function MarketplaceClinicDetailPage() {
           {[
             { code: "STARTER", name: "Esencial", priceLabel: "Gratis", description: "Para consultorios que comienzan a digitalizar su agenda.", features: ["Agenda online", "Gestion de pacientes", "Soporte inicial"], free: true },
             { code: "PROFESSIONAL", name: "Profesional", priceLabel: "S/ 50 al mes", description: "Para clinicas que coordinan un equipo medico en crecimiento.", features: ["Todo lo esencial", "Mas capacidad para el equipo", "Gestion de agenda de clinica"], featured: true },
-            { code: "ENTERPRISE", name: "Vip", priceLabel: "S/ 150 al mes", description: "Para operaciones con necesidades de acompanamiento especializado.", features: ["Todo lo profesional", "Configuracion a medida", "Soporte prioritario"] },
+            { code: "ENTERPRISE", name: "Vip", priceLabel: "S/ 160 al mes", description: "Para operaciones con necesidades de acompanamiento especializado.", features: ["Todo lo profesional", "Configuracion a medida", "Soporte prioritario"] },
           ].map((plan) => (
             <Col xs={24} md={8} key={plan.code}>
               <article className={`subscription-plan${plan.featured ? " subscription-plan--featured" : ""}`}>
