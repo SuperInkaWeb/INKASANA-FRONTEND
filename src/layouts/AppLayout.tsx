@@ -106,11 +106,6 @@ export function AppLayout() {
             icon: <TeamOutlined />,
             label: "Pacientes",
           },
-          {
-            key: "appointments",
-            icon: <CalendarOutlined />,
-            label: "Citas",
-          },
         ]
       : []),
 
@@ -131,6 +126,21 @@ export function AppLayout() {
             icon: <ClockCircleOutlined />,
             label: "Agenda de la Clínica",
           },
+           {
+            key: "appointments",
+            icon: <CalendarOutlined />,
+            label: "Citas",
+          },
+        ]
+        
+      : []),
+       ...(canManageUsers
+      ? [
+          {
+            key: "billing",
+            icon: <CreditCardOutlined />,
+            label: "Facturación",
+          },
         ]
       : []),
 
@@ -143,17 +153,6 @@ export function AppLayout() {
           },
         ]
       : []),
-
-    ...(canManageUsers
-      ? [
-          {
-            key: "billing",
-            icon: <CreditCardOutlined />,
-            label: "Facturación",
-          },
-        ]
-      : []),
-
     {
       key: "profile",
       icon: <UserOutlined />,
@@ -164,7 +163,7 @@ export function AppLayout() {
           {
             key: "my-marketplace",
             icon: <ShopOutlined />,
-            label: "Mi Marketplace",
+            label: "Mi Clinica",
           },
           {
             key: "clinic-profile",
