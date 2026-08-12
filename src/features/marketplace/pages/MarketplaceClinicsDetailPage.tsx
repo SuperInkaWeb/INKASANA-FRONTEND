@@ -178,6 +178,15 @@ export function MarketplaceClinicDetailPage() {
     clinic?.carouselImageUrl2 ?? clinic?.coverImageUrl ?? slideTwo,
   ];
   const goToBilling = (planCode: string) => {
+    if (isPatient) {
+      Modal.info({
+        title: "Suscripciones para clínicas",
+        content: "Estas suscripciones son para clínicas. Próximamente podrás conocer los planes disponibles para pacientes.",
+        okText: "Entendido",
+      });
+      return;
+    }
+
     if (!clinic?.slug) {
       return;
     }
