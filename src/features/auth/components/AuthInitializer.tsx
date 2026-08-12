@@ -40,6 +40,11 @@ export function AuthInitializer({ children }: AuthInitializerProps) {
         ) {
           setAuthToken(existingToken);
           setSessionStatus("ready");
+          const postLoginPath = localStorage.getItem("post_login_path");
+          localStorage.removeItem("post_login_path");
+          if (postLoginPath?.startsWith("/") && !postLoginPath.startsWith("//")) {
+            window.location.assign(postLoginPath);
+          }
           return;
         }
 
