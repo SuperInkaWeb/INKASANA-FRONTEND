@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { 
   Avatar, 
   Button, 
@@ -115,6 +115,14 @@ export function MarketplaceClinicDetailPage() {
   const [modal, setModal] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [activeSpecialty, setActiveSpecialty] = useState("");
+
+  // Al volver desde Mercado Pago, algunos navegadores restauran la página
+  // desde su caché con el estado anterior. Nunca dejamos el modal bloqueado.
+  useEffect(() => {
+    const resetCheckoutState = () => setCheckoutLoading(false);
+    window.addEventListener("pageshow", resetCheckoutState);
+    return () => window.removeEventListener("pageshow", resetCheckoutState);
+  }, []);
   
   const clinicQuery = useQuery({ 
     queryKey: ["marketplace-clinic", slug], 
@@ -898,7 +906,7 @@ export function MarketplaceClinicDetailPage() {
         title="Disponibilidad del médico" 
         okText="Agendar y pagar" 
         cancelText="Cerrar" 
-        onCancel={() => setModal(false)} 
+        onCancel={() => { setCheckoutLoading(false); setModal(false); }} 
         onOk={startAppointmentCheckout}
         confirmLoading={checkoutLoading}
       >
