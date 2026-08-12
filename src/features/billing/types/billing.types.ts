@@ -19,3 +19,13 @@ export type SubscriptionPlanCode = "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
 export interface CheckoutSessionResponse {
   url: string;
 }
+
+export interface PaymentHistoryItem {
+  id: string;
+  purpose: string;
+  invoiceNumber: string | null;
+  amountCents: number;
+  currency: string;
+  status: string;
+  paidAt: string | null;
+}

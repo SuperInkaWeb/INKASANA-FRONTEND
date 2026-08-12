@@ -2,11 +2,17 @@ import { api } from "../../../shared/api/api";
 import type {
   BillingSummary,
   CheckoutSessionResponse,
+  PaymentHistoryItem,
   SubscriptionPlanCode,
 } from "../types/billing.types";
 
 export async function getBillingSummary(): Promise<BillingSummary> {
   const { data } = await api.get<BillingSummary>("/api/billing/subscription");
+  return data;
+}
+
+export async function getPaymentHistory(): Promise<PaymentHistoryItem[]> {
+  const { data } = await api.get<PaymentHistoryItem[]>("/api/billing/payments");
   return data;
 }
 

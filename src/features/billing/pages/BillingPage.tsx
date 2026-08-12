@@ -6,13 +6,14 @@ import {
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Alert, Button, Card, Col, Descriptions, Popconfirm, Result, Row, Space, Tag, Typography, message } from "antd";
+import { Alert, Button, Card, Col, Descriptions, Popconfirm, Result, Row, Space, Table, Tag, Typography, message } from "antd";
 import { useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   cancelSubscription,
   createCheckoutSession,
   getBillingSummary,
+  getPaymentHistory,
 } from "../api/billing.api";
 import type { SubscriptionPlanCode } from "../types/billing.types";
 
@@ -72,6 +73,7 @@ export function BillingPage() {
   );
   const queryClient = useQueryClient();
   const summaryQuery = useQuery({ queryKey: ["billing-summary"], queryFn: getBillingSummary });
+  const paymentsQuery = useQuery({ queryKey: ["billing-payments"], queryFn: getPaymentHistory });
   const redirectTo = (url: string) => window.location.assign(url);
   const checkout = useMutation({
     mutationFn: createCheckoutSession,
@@ -81,7 +83,7 @@ export function BillingPage() {
   const cancel = useMutation({
     mutationFn: cancelSubscription,
     onSuccess: () => {
-      message.success("Se programó la cancelación de tu suscripción.");
+      message.success("La suscripción o pago pendiente fue cancelado.");
       queryClient.invalidateQueries({ queryKey: ["billing-summary"] });
     },
     onError: () => message.error("No fue posible cancelar la suscripción."),
@@ -109,7 +111,8 @@ export function BillingPage() {
 
   const summary = summaryQuery.data;
   const state = statusLabels[summary.status] ?? statusLabels.NONE;
-  const hasSubscription = !["NONE", "CANCELED"].includes(summary.status);
+  // Un checkout incompleto no es una suscripción: debe permitir escoger otro plan.
+  const hasSubscription = ["ACTIVE", "TRIALING", "PAST_DUE"].includes(summary.status);
   const renewalDate = summary.currentPeriodEnd
     ? new Intl.DateTimeFormat("es-PE", { dateStyle: "medium" }).format(new Date(summary.currentPeriodEnd))
     : "-";
@@ -125,12 +128,40 @@ export function BillingPage() {
         <Alert type="warning" showIcon icon={<ExclamationCircleOutlined />} message="Hay un pago pendiente" description="Actualiza tu método de pago desde el portal para conservar el servicio activo." />
       )}
 
+      {summary.status === "INCOMPLETE" && (
+        <Alert
+          type="warning"
+          showIcon
+          message="Hay un checkout de suscripción pendiente"
+          description="Puedes cancelarlo o elegir otro plan. Al elegir otro plan, el pendiente se cancela automáticamente."
+          action={<Button size="small" danger loading={cancel.isPending} onClick={() => cancel.mutate()}>Cancelar pendiente</Button>}
+        />
+      )}
+
       <Card title="Estado de la suscripción" extra={<Tag color={state.color}>{state.label}</Tag>}>
         <Descriptions column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="Plan">{summary.planName ?? "Sin plan contratado"}</Descriptions.Item>
           <Descriptions.Item label="Próxima renovación">{renewalDate}</Descriptions.Item>
           {summary.cancelAtPeriodEnd && <Descriptions.Item label="Cancelación" span={2}>La suscripción finalizará al término del período actual.</Descriptions.Item>}
         </Descriptions>
+      </Card>
+
+      <Card title="Historial de pagos">
+        <Table
+          rowKey="id"
+          size="small"
+          loading={paymentsQuery.isLoading}
+          pagination={{ pageSize: 6, hideOnSinglePage: true }}
+          locale={{ emptyText: "Aún no hay pagos registrados." }}
+          dataSource={paymentsQuery.data ?? []}
+          columns={[
+            { title: "Concepto", dataIndex: "purpose", render: (purpose: string) => purpose === "APPOINTMENT" ? "Consulta médica" : "Suscripción" },
+            { title: "Comprobante", dataIndex: "invoiceNumber", render: (value: string | null) => value ?? "-" },
+            { title: "Monto", render: (_, record) => new Intl.NumberFormat("es-PE", { style: "currency", currency: record.currency }).format(record.amountCents / 100) },
+            { title: "Estado", dataIndex: "status", render: (status: string) => <Tag color={status === "PAID" ? "success" : "default"}>{status === "PAID" ? "Pagado" : status}</Tag> },
+            { title: "Fecha de pago", dataIndex: "paidAt", render: (value: string | null) => value ? new Intl.DateTimeFormat("es-PE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "-" },
+          ]}
+        />
       </Card>
 
       {!hasSubscription && (
