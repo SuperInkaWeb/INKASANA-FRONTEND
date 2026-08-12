@@ -12,6 +12,7 @@ import {
   Tag,
   Typography,
   DatePicker,
+  Modal,
   message,
 } from "antd";
 import {
@@ -23,6 +24,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs"
 import { createMarketplaceAppointmentCheckout, getMarketplaceDoctor, getMarketplaceDoctorSlots } from "../api/marketplace.api";
+import { useAuthStore } from "../../../app/store/auth.store";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -40,6 +42,8 @@ export function MarketplaceDoctorDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { role, roles } = useAuthStore();
+  const isPatient = role === "PATIENT" || roles.includes("PATIENT");
 
   const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -79,6 +83,17 @@ export function MarketplaceDoctorDetailPage() {
     onError: (error: Error) => message.error(error.message || "No se pudo iniciar el pago de la cita."),
   });
   const handleAppointmentCheckout = () => {
+    if (!isPatient) {
+      Modal.confirm({
+        title: "Inicia sesión para pagar tu consulta",
+        content: "Primero debes iniciar sesión o registrarte como paciente para reservar y pagar una cita.",
+        okText: "Iniciar sesión o registrarme",
+        cancelText: "Ahora no",
+        onOk: () => navigate("/patient/login"),
+      });
+      return;
+    }
+
     if (!selectedSlot) {
       message.warning("Selecciona primero una fecha y un horario disponible.");
       return;

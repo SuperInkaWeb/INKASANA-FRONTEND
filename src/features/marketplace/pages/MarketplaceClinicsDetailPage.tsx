@@ -175,6 +175,19 @@ export function MarketplaceClinicDetailPage() {
     }
 
     const returnTo = `/billing?plan=${encodeURIComponent(planCode)}&checkout=1`;
+    if (!hasActiveSession) {
+      Modal.confirm({
+        title: "Inicia sesión para elegir un plan",
+        content: "Primero debes iniciar sesión con la cuenta administradora de la clínica para contratar una suscripción.",
+        okText: "Iniciar sesión",
+        cancelText: "Ahora no",
+        onOk: () => navigate(
+          `/login?slug=${encodeURIComponent(clinic.slug)}&returnTo=${encodeURIComponent(returnTo)}`
+        ),
+      });
+      return;
+    }
+
     navigate(
       `/login?slug=${encodeURIComponent(clinic.slug)}&returnTo=${encodeURIComponent(returnTo)}`
     );
@@ -192,6 +205,20 @@ export function MarketplaceClinicDetailPage() {
 
   const startAppointmentCheckout = async () => {
     if (!doctor?.slug || !doctor?.doctorId || !slot) return;
+    if (!isPatient) {
+      Modal.confirm({
+        title: "Inicia sesión para pagar tu consulta",
+        content: "Primero debes iniciar sesión o registrarte como paciente para reservar y pagar una cita.",
+        okText: "Iniciar sesión o registrarme",
+        cancelText: "Ahora no",
+        onOk: () => {
+          setModal(false);
+          navigate("/patient/login");
+        },
+      });
+      return;
+    }
+
     try {
       setCheckoutLoading(true);
       const checkout = await createMarketplaceAppointmentCheckout(doctor.slug, {
