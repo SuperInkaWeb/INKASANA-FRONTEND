@@ -216,8 +216,8 @@ export function MarketplaceClinicDetailPage() {
     if (!isPatient) {
       Modal.confirm({
         title: "Inicia sesión para pagar tu consulta",
-        content: "Primero debes iniciar sesión o registrarte como paciente para reservar y pagar una cita.",
-        okText: "Iniciar sesión o registrarme",
+        content: "Las citas solo pueden reservarse con una cuenta de paciente. Si eres clínica o profesional, usa el botón Iniciar sesión del menú.",
+        okText: "Ingresar como paciente",
         cancelText: "Ahora no",
         onOk: () => {
           setModal(false);

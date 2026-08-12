@@ -35,7 +35,7 @@ export function MarketplaceClinicsPage() {
             <Button type="text" style={{ color: "#284b76", fontWeight: 600 }} onClick={() => goHomeSection("especialidades")}>Especialidades</Button>
             <Button type="text" style={{ color: "#1677ff", fontWeight: 700 }}>Clínicas</Button>
             <Button type="text" style={{ color: "#284b76", fontWeight: 600 }} onClick={() => goHomeSection("blog")}>Blog</Button>
-            <Button type="primary" size="large" onClick={() => navigate("/patient/login")}>Iniciar sesión</Button>
+            <Button type="primary" size="large" onClick={() => navigate("/access")}>Iniciar sesión</Button>
           </Space>
         </div>
       </header>

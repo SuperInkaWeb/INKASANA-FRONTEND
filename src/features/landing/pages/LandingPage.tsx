@@ -52,7 +52,7 @@ export function LandingPage() {
             <Button type="text" style={{ color: "#284b76", fontWeight: 600 }} onClick={() => scrollToSection("especialidades")}>Especialidades</Button>
             <Button type="text" style={{ color: "#284b76", fontWeight: 600 }} onClick={() => navigate("/marketplace/clinics")}>Clínicas</Button>
             <Button type="text" style={{ color: "#284b76", fontWeight: 600 }} onClick={() => scrollToSection("blog")}>Blog</Button>
-            <Button type="primary" size="large" onClick={() => navigate("/patient/login")}>Iniciar sesión</Button>
+            <Button type="primary" size="large" onClick={() => navigate("/access")}>Iniciar sesión</Button>
           </Space>
         </div>
       </header>
