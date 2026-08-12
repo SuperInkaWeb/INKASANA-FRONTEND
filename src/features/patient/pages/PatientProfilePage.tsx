@@ -50,7 +50,7 @@ export function PatientProfilePage() {
     logoutInternal();
     logout({
       logoutParams: {
-        returnTo: `${window.location.origin}/marketplace/clinics`,
+        returnTo: window.location.origin,
       },
     });
   };

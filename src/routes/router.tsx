@@ -28,7 +28,6 @@ import { MyMarketplaceRedirectPage } from "../features/marketplace/pages/MyMarke
 import { PrivateRoute } from "./PrivateRoute";
 import { RoleRoute } from "./RoleRoute";
 import { AccessDeniedPage } from "../pages/AccessDeniedPage";
-import { HomeRedirect } from "./HomeRedirect";
 import { PatientAccessPage } from "../features/patient/pages/PatientAccessPage";
 import { PatientLoginPage } from "../features/patient/pages/PatientLoginPage";
 import { PatientDashboardPage } from "../features/patient/pages/PatientDashboardPage";
@@ -36,8 +35,13 @@ import { PatientAppointmentsPage } from "../features/patient/pages/PatientAppoin
 import { PatientAgendaPage } from "../features/patient/pages/PatientAgendaPage";
 import { PatientProfilePage } from "../features/patient/pages/PatientProfilePage";
 import { PatientMarketplacePage } from "../features/patient/pages/PatientMarketplacePage";
+import { LandingPage } from "../features/landing/pages/LandingPage";
 
 export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LandingPage />,
+  },
   {
     path: "/login",
     element: <LoginPage />,
@@ -76,13 +80,8 @@ export const router = createBrowserRouter([
     element: <PrivateRoute />,
     children: [
       {
-        path: "/",
         element: <AppLayout />,
         children: [
-          {
-            index: true,
-            element: <HomeRedirect />,
-          },
           {
             path: "dashboard",
             element: <DashboardPage />,

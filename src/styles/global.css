@@ -14,6 +14,89 @@ body {
   min-height: 100vh;
 }
 
+/* Tarjetas de especialidades en la portada: entrada al hacer scroll y profundidad al pasar el mouse. */
+.landing-specialty-motion {
+  height: 100%;
+}
+
+.landing-specialty-card {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  transform: perspective(900px) rotateX(0) rotateY(0) translateY(0) scale(1);
+  transform-style: preserve-3d;
+  transition: transform 320ms cubic-bezier(.2,.8,.2,1), box-shadow 320ms ease;
+}
+
+.landing-specialty-card::after {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: -100%;
+  width: 55%;
+  height: 100%;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent, rgb(255 255 255 / 36%), transparent);
+  transition: left 520ms ease;
+}
+
+.landing-specialty-card:hover {
+  z-index: 1;
+  transform: perspective(900px) rotateX(7deg) rotateY(-7deg) translateY(-16px) scale(1.045);
+  box-shadow: 0 30px 48px rgb(20 70 130 / 30%);
+}
+
+.landing-specialty-card:hover::after {
+  left: 150%;
+}
+
+.landing-specialty-card .ant-card {
+  height: 100%;
+  border-color: #dce8f5;
+  background: rgb(255 255 255 / 93%);
+  transition: background 280ms ease;
+}
+
+.landing-specialty-card:hover .ant-card {
+  background: #fff;
+}
+
+.landing-specialty-orb {
+  position: absolute;
+  z-index: 4;
+  right: -94px;
+  bottom: -94px;
+  width: 175px;
+  height: 175px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 35% 35%, #82ddd2, #1677ff);
+  opacity: 0.16;
+  transform: scale(1);
+  transition: transform 460ms cubic-bezier(.2,.8,.2,1), opacity 300ms ease;
+}
+
+.landing-specialty-card:hover .landing-specialty-orb {
+  opacity: 0.42;
+  transform: scale(2.55);
+}
+
+.landing-specialty-card .ant-card-cover,
+.landing-specialty-card .ant-card-body {
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-specialty-card,
+  .landing-specialty-card::after,
+  .landing-specialty-orb {
+    transition: none;
+  }
+}
+
 /* En el perfil público, la clínica ya se identifica en la barra superior y
    en "Sobre nosotros"; este bloque repetía innecesariamente su nombre y datos. */
 .clinic-carousel .slick-arrow {

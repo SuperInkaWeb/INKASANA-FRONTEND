@@ -79,7 +79,7 @@ export function LoginPage() {
 
     logout({
       logoutParams: {
-        returnTo: `${window.location.origin}/login`,
+        returnTo: window.location.origin,
       },
     });
   };
