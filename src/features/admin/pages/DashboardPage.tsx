@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { getPatients } from "../../patients/api/patients.api";
 import { doctorService } from "../../doctors/services/doctor.service";
 import { brandingService } from "../../branding/services/branding.service";
+import { appointmentService } from "../../appointments/services/appointment.service";
 
 const { Title, Text } = Typography;
 
@@ -68,6 +69,15 @@ export function DashboardPage() {
     queryFn: () => doctorService.findAll(),
   });
 
+  const {
+    data: appointmentSummary,
+    isLoading: loadingAppointments,
+    isError: isAppointmentsError,
+  } = useQuery({
+    queryKey: ["dashboard", "appointments-summary"],
+    queryFn: appointmentService.summary,
+  });
+
   const activePatients = patients.filter((p) => p.status === "ACTIVE").length;
   const inactivePatients = patients.filter(
     (p) => p.status === "INACTIVE"
@@ -79,7 +89,7 @@ export function DashboardPage() {
   const recentPatients = getRecentItems(patients);
   const recentDoctors = getRecentItems(doctors);
 
-  const hasError = isPatientsError || isDoctorsError || isBrandingError;
+  const hasError = isPatientsError || isDoctorsError || isBrandingError || isAppointmentsError;
 
   return (
     <>
@@ -180,7 +190,12 @@ export function DashboardPage() {
                 Pacientes registrados: {patients.length}
               </Tag>
 
-              <Tag color="orange">Citas pendientes de implementación</Tag>
+              <Tag
+                icon={<CheckCircleOutlined />}
+                color={appointmentSummary?.confirmedAppointments ? "green" : "default"}
+              >
+                Citas confirmadas: {appointmentSummary?.confirmedAppointments ?? 0}
+              </Tag>
             </Space>
           </Card>
         </Col>
@@ -221,12 +236,12 @@ export function DashboardPage() {
           <Card>
             <Statistic
               title="Citas registradas"
-              value={0}
-              loading={false}
+              value={appointmentSummary?.confirmedAppointments ?? 0}
+              loading={loadingAppointments}
               prefix={<CalendarOutlined />}
             />
 
-            <Text type="secondary">Pendiente de implementación</Text>
+            <Text type="secondary">Citas confirmadas</Text>
           </Card>
         </Col>
       </Row>
