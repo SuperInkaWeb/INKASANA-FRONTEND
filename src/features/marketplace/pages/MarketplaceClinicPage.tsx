@@ -1,27 +1,109 @@
-import { Button, Carousel, Col, Empty, Row, Space, Typography } from "antd";
+import { EnvironmentOutlined, HeartFilled, SafetyCertificateOutlined, ShopOutlined } from "@ant-design/icons";
+import { Avatar, Button, Card, Col, Empty, Row, Space, Spin, Tag, Typography } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import slideOne from "../../../assets/transcurrir 1.jpg";
-import slideTwo from "../../../assets/transcurrir 2.jpg";
+
+import portalLogo from "../../../assets/branding/inkasana-portal-logo.png";
+import clinicDirectoryAttentionImage from "../../../assets/branding/clinic-directory-attention.png";
 import { getMarketplaceClinics } from "../api/marketplace.api";
-import { ClinicMarketplaceCard } from "../components/ClinicMarketplaceCard";
 
 const { Title, Paragraph, Text } = Typography;
-const sectionStyle: React.CSSProperties = { marginTop: 72 };
 
 export function MarketplaceClinicsPage() {
   const navigate = useNavigate();
-  const { data: clinics = [], isLoading } = useQuery({ queryKey: ["marketplace-clinics"], queryFn: () => getMarketplaceClinics() });
-  const goTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  const navButton: React.CSSProperties = { color: "#fff" };
+  const { data: clinics = [], isLoading } = useQuery({
+    queryKey: ["marketplace-clinics"],
+    queryFn: () => getMarketplaceClinics(),
+  });
 
-  return <div className="marketplace-page" style={{ background: "#fff", minHeight: "100vh", color: "#263746" }}>
-    <header style={{ background: "#0868b8", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 2px 16px #003f7729" }}><div style={{ maxWidth: 1180, minHeight: 66, margin: "auto", padding: "14px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}><Button type="text" onClick={() => navigate("/marketplace/clinics")} style={{ padding: 0, height: "auto", color: "#fff", fontWeight: 700, fontSize: 18 }}>HealthHub 360</Button><Space size="middle" wrap><Button type="text" style={navButton} onClick={() => goTo("clinicas")}>Clínicas</Button><Button type="text" style={navButton} onClick={() => goTo("blog")}>Blog</Button></Space></div></header>
-    <main style={{ maxWidth: 1180, margin: "auto", padding: "32px 24px 72px" }}>
-      <Carousel arrows autoplay autoplaySpeed={4000} effect="fade" className="clinic-carousel"><img alt="Atención médica" src={slideOne} style={{ width: "100%", height: 390, objectFit: "cover", borderRadius: 22 }} /><img alt="Profesionales de salud" src={slideTwo} style={{ width: "100%", height: 390, objectFit: "cover", borderRadius: 22 }} /></Carousel>
-      <section style={{ textAlign: "center", maxWidth: 840, margin: "64px auto" }}><Title level={3} style={{ color: "#164f82", fontSize: 28 }}>Un poco sobre nosotros</Title><Paragraph style={{ fontSize: 17, lineHeight: 1.8, color: "#51606e" }}>Somos una organización que selecciona cuidadosamente las mejores clínicas certificadas por el Ministerio de Salud. Reunimos información clara para que puedas encontrar profesionales, especialidades y horarios de atención con tranquilidad.</Paragraph><Paragraph style={{ fontSize: 17, lineHeight: 1.8, color: "#51606e" }}>Creemos que cuidar la salud debe ser más simple, por eso acercamos instituciones confiables a las personas y familias que necesitan una atención segura, humana y oportuna.</Paragraph></section>
-      <section id="clinicas"><Title level={2} style={{ color: "#164f82" }}>Clínicas</Title><Text type="secondary">Contamos con más de 10 clínicas certificadas.</Text><Row gutter={[20, 20]} style={{ marginTop: 24 }}>{!isLoading && clinics.length === 0 ? <Col span={24}><Empty description="Aún no hay clínicas publicadas" /></Col> : clinics.map(clinic => <Col xs={24} sm={12} lg={8} key={clinic.id}><ClinicMarketplaceCard clinic={clinic} /></Col>)}</Row></section>
-      <section id="blog" style={{ ...sectionStyle, background: "#eef7ff", padding: 36, borderRadius: 22 }}><Title level={2} style={{ color: "#164f82" }}>¿Por qué somos tu mejor opción?</Title><Paragraph>Te ayudamos a encontrar atención certificada, comparar alternativas y organizar tus citas desde un solo lugar. Información clara, profesionales disponibles y menos tiempo de espera para cuidar lo que más importa: tu salud.</Paragraph><Paragraph>En nuestro marketplace puedes revisar instituciones, conocer sus servicios y dar el primer paso para organizar tu cita sin llamadas interminables ni desplazamientos innecesarios. Nuestro objetivo es que tomes decisiones informadas y encuentres la atención que necesitas en el momento adecuado.</Paragraph><Paragraph>Seguiremos sumando contenido útil sobre prevención, bienestar y las especialidades médicas que pueden acompañarte durante cada etapa de tu vida.</Paragraph></section>
+  const goHomeSection = (section: string) => navigate(`/#${section}`);
+
+  return (
+    <main style={{ minHeight: "100vh", background: "#fff", color: "#263746" }}>
+      <header style={{ position: "sticky", top: 0, zIndex: 20, background: "rgba(255,255,255,.96)", boxShadow: "0 2px 14px #a1acee29" }}>
+        <div style={{ maxWidth: 1180, minHeight: 70, margin: "auto", padding: "10px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
+          <Button type="text" onClick={() => navigate("/")} style={{ padding: 0, height: "auto" }}>
+            <Space size={10}>
+              <img src={portalLogo} alt="Logo de Clínica Inkasana" style={{ width: 50, height: 50, borderRadius: 14, objectFit: "contain" }} />
+              <span style={{ textAlign: "left" }}>
+                <Text strong style={{ display: "block", fontSize: 18, color: "#123f76" }}>Clínica Inkasana</Text>
+                <Text style={{ fontSize: 12, color: "#6f7d92" }}>Atención médica cercana</Text>
+              </span>
+            </Space>
+          </Button>
+          <Space size="middle" wrap>
+            <Button type="text" style={{ color: "#284b76", fontWeight: 600 }} onClick={() => goHomeSection("especialidades")}>Especialidades</Button>
+            <Button type="text" style={{ color: "#1677ff", fontWeight: 700 }}>Clínicas</Button>
+            <Button type="text" style={{ color: "#284b76", fontWeight: 600 }} onClick={() => goHomeSection("blog")}>Blog</Button>
+            <Button type="primary" size="large" onClick={() => navigate("/patient/login")}>Iniciar sesión</Button>
+          </Space>
+        </div>
+      </header>
+
+      <section style={{ background: "#f4f8ff", padding: "52px 24px 62px" }}>
+        <Row gutter={[42, 30]} align="middle" style={{ maxWidth: 1120, margin: "auto" }}>
+          <Col xs={24} md={14}>
+            <Tag color="blue" style={{ borderRadius: 20, padding: "5px 12px", marginBottom: 15 }}>DIRECTORIO DE SALUD</Tag>
+            <Title style={{ color: "#10213e", fontSize: "clamp(34px, 4vw, 52px)", lineHeight: 1.12, marginBottom: 16 }}>Clínicas para acompañarte en cada paso.</Title>
+            <Paragraph style={{ color: "#53627d", fontSize: 18, lineHeight: 1.7, maxWidth: 650 }}>
+              Conoce las clínicas registradas en Inkasana, sus servicios y especialistas. Elige la institución que mejor se ajuste a tus necesidades.
+            </Paragraph>
+            <Space size="middle" wrap style={{ marginTop: 14 }}>
+              <Button type="primary" size="large" onClick={() => document.getElementById("clinicas-registradas")?.scrollIntoView({ behavior: "smooth" })}>Ver clínicas registradas</Button>
+              <Button size="large" onClick={() => navigate("/")}>Volver al inicio</Button>
+            </Space>
+          </Col>
+          <Col xs={24} md={10} style={{ textAlign: "center" }}>
+            <Card bordered={false} style={{ borderRadius: 25, maxWidth: 350, margin: "auto", boxShadow: "0 18px 42px rgba(24,57,111,.13)" }}>
+              <img src={clinicDirectoryAttentionImage} alt="Paciente gestionando una cita médica desde su celular" style={{ width: "100%", maxWidth: 265, borderRadius: 16, display: "block", margin: "0 auto" }} />
+              <Title level={4} style={{ marginBottom: 4 }}>Atención más simple</Title>
+              <Text type="secondary">Revisa información clara antes de elegir.</Text>
+            </Card>
+          </Col>
+        </Row>
+      </section>
+
+      <section id="clinicas-registradas" style={{ maxWidth: 1180, margin: "0 auto", padding: "68px 24px 76px" }}>
+        <div style={{ textAlign: "center", maxWidth: 710, margin: "0 auto 34px" }}>
+          <Title level={2} style={{ color: "#164f82", marginBottom: 8 }}>Clínicas registradas</Title>
+          <Paragraph style={{ color: "#64748b", fontSize: 16 }}>Cada clínica tiene su propio perfil, especialidades y horarios de atención.</Paragraph>
+        </div>
+
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: 48 }}><Spin size="large" /></div>
+        ) : clinics.length === 0 ? (
+          <Empty description="Aún no hay clínicas publicadas" />
+        ) : (
+          <Row gutter={[24, 24]}>
+            {clinics.map((clinic) => (
+              <Col xs={24} sm={12} lg={8} key={clinic.id}>
+                <div className="landing-specialty-card clinic-directory-card">
+                  <div className="landing-specialty-orb" />
+                  <Card style={{ height: "100%", borderRadius: 16, overflow: "hidden", position: "relative" }} bodyStyle={{ display: "flex", height: "100%", flexDirection: "column", gap: 16 }}>
+                    <Space align="center" size={14}>
+                      <Avatar size={68} shape="square" src={clinic.profileImageUrl || undefined} icon={<ShopOutlined />} style={{ background: "#eaf3ff" }} />
+                      <div>
+                        <Title level={4} style={{ margin: 0, color: "#164f82" }}>{clinic.displayName}</Title>
+                        {clinic.headline && <Text type="secondary">{clinic.headline}</Text>}
+                      </div>
+                    </Space>
+                    <Space wrap>
+                      {clinic.city && <Tag icon={<EnvironmentOutlined />}>{clinic.city}</Tag>}
+                      {clinic.country && <Tag color="blue">{clinic.country}</Tag>}
+                    </Space>
+                    <Paragraph style={{ color: "#66758c", flex: 1, margin: 0 }}>{clinic.address || "Consulta sus especialidades, profesionales y horarios disponibles."}</Paragraph>
+                    <Button type="primary" block onClick={() => navigate(`/marketplace/clinics/${clinic.slug}`)}>Ver clínica</Button>
+                  </Card>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        )}
+      </section>
+
+      <footer style={{ background: "#102f57", color: "#d9eaff", textAlign: "center", padding: 24 }}>
+        <Space><img src={portalLogo} alt="" style={{ width: 30, height: 30, objectFit: "contain" }} /><Text style={{ color: "#fff" }}>Clínica Inkasana</Text><SafetyCertificateOutlined style={{ color: "#6ee7d8" }} /><HeartFilled style={{ color: "#f17689" }} /></Space>
+      </footer>
     </main>
-  </div>;
+  );
 }

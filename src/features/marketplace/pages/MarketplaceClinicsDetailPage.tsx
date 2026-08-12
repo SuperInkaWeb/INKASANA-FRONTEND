@@ -797,12 +797,14 @@ export function MarketplaceClinicDetailPage() {
         <Row gutter={[18, 18]} style={{ marginTop: 24 }}>
           {specialties.map(item => (
             <Col xs={24} sm={12} lg={8} key={item}>
-              <motion.div
+              <motion.div className="landing-specialty-motion"
               initial={{opacity: 0, y: 60}}
               whileInView={{ opacity: 1, y:0}}
               viewport={{ once:true}}
               transition={{duration: 0.6}}
               >
+              <div className="landing-specialty-card clinic-specialty-card">
+                <div className="landing-specialty-orb" />
               <Card 
                 cover={
                   <img 
@@ -822,6 +824,7 @@ export function MarketplaceClinicDetailPage() {
                   Más información
                 </Button>
               </Card>
+              </div>
               </motion.div>
             </Col>
           ))}
